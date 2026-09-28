@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @swagger
- * /produto/pesquisa:
+ * /v1/produto/pesquisa:
  *   get:
  *     tags:
  *       - Produtos
@@ -67,7 +67,7 @@ router.get('/pesquisa', productController.search);
 
 /**
  * @swagger
- * /produto/{id}:
+ * /v1/produto/{id}:
  *   get:
  *     tags:
  *       - Produtos
@@ -92,7 +92,7 @@ router.get('/:id', productController.getById);
 
 /**
  * @swagger
- * /produto:
+ * /v1/produto:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -133,7 +133,7 @@ router.get('/:id', productController.getById);
  *                       example: 'image/png'
  *                     content:
  *                       type: string
- *                       example: 'base64 da imagem...'
+ *                       example: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80'
  *               options:
  *                 type: array
  *                 items:
@@ -160,7 +160,7 @@ router.post('/', authMiddleware, productController.create);
 
 /**
  * @swagger
- * /produto/{id}:
+ * /v1/produto/{id}:
  *   put:
  *     security:
  *       - bearerAuth: []
@@ -221,7 +221,7 @@ router.put('/:id', authMiddleware, productController.update);
 
 /**
  * @swagger
- * /produto/{id}:
+ * /v1/produto/{id}:
  *   delete:
  *     security:
  *       - bearerAuth: []

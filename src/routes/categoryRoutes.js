@@ -13,7 +13,7 @@ const router = Router();
 
 /**
  * @swagger
- * /categoria/pesquisa:
+ * /v1/categoria/pesquisa:
  *   get:
  *     tags:
  *       - Categorias
@@ -52,7 +52,7 @@ router.get('/pesquisa', categoryController.search);
 
 /**
  * @swagger
- * /categoria/{id}:
+ * /v1/categoria/{id}:
  *   get:
  *     tags:
  *       - Categorias
@@ -75,7 +75,7 @@ router.get('/:id', categoryController.getById);
 
 /**
  * @swagger
- * /categoria:
+ * /v1/categoria:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -111,7 +111,7 @@ router.post('/', authMiddleware, categoryController.create);
 
 /**
  * @swagger
- * /categoria/{id}:
+ * /v1/categoria/{id}:
  *   put:
  *     security:
  *       - bearerAuth: []
@@ -154,7 +154,7 @@ router.put('/:id', authMiddleware, categoryController.update);
 
 /**
  * @swagger
- * /categoria/{id}:
+ * /v1/categoria/{id}:
  *   delete:
  *     security:
  *       - bearerAuth: []

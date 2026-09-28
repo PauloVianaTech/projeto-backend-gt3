@@ -4,6 +4,16 @@ const ProductImage = require('../models/ProductImage');
 const ProductOption = require('../models/ProductOption');
 const { Op, Sequelize } = require('sequelize');
 
+const getImageUrl = (image) => {
+  const content = typeof image?.content === 'string' ? image.content.trim() : '';
+
+  if (!/^https?:\/\//i.test(content)) {
+    throw new Error('Cada imagem deve informar uma URL pública iniciada por http:// ou https://.');
+  }
+
+  return content;
+};
+
 class ProductService {
   /**
    * Realiza uma busca complexa por produtos com base em query params.
@@ -114,7 +124,7 @@ class ProductService {
         if (images && Array.isArray(images)) {
             const imagePromises = images.map(img => ProductImage.create({
                 product_id: product.id,
-                path: `path/to/${product.slug}-${Date.now()}.${img.type.split('/')[1]}`
+                path: getImageUrl(img)
             }, { transaction }));
             await Promise.all(imagePromises);
         }
@@ -165,10 +175,15 @@ class ProductService {
             for (const image of images) {
                 if (image.id && image.deleted) {
                     await ProductImage.destroy({ where: { id: image.id, product_id: product.id }, transaction });
+                } else if (image.id && image.content) {
+                    await ProductImage.update(
+                        { path: getImageUrl(image) },
+                        { where: { id: image.id, product_id: product.id }, transaction }
+                    );
                 } else if (!image.id && image.content) {
                     await ProductImage.create({
                         product_id: product.id,
-                        path: `path/to/${product.slug}-${Date.now()}.${image.type.split('/')[1]}`
+                        path: getImageUrl(image)
                     }, { transaction });
                 }
             }

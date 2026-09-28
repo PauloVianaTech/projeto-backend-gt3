@@ -4,12 +4,12 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "npm run dev",
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "test": "jest --runInBand --forceExit --testTimeout=30000"
   },
   "keywords": [],
-  "author": "",
+  "author": "Paulo Viana (PauloVianaTech)",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

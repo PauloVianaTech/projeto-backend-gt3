@@ -1,166 +1,178 @@
-# Backend API - Project Root
-## Descrição
+# Backend GT3
 
-Este projeto consiste em uma API backend desenvolvida com Node.js, utilizando Express e Sequelize para integração com banco de dados relacional. A aplicação foi estruturada seguindo uma arquitetura em camadas, com foco em organização, escalabilidade e facilidade de manutenção.
+API de e-commerce desenvolvida com Node.js, Express, PostgreSQL e Sequelize. O projeto segue arquitetura em camadas, com controllers, services, models, routes, middleware e database, além de autenticação JWT, documentação Swagger e testes de API para usuários, categorias e produtos.
 
-A API é responsável por gerenciar recursos essenciais de um sistema de e-commerce, incluindo usuários, autenticação, categorias e produtos, além de suportar funcionalidades relacionadas a imagens e variações de produtos.
+## Tecnologias
 
----
-
-## Tecnologias Utilizadas
-
-- Node.js  
-- Express  
-- Sequelize ORM  
-- PostgreSQL  
-- JSON Web Token (JWT) para autenticação  
-- Bcrypt para criptografia de senhas  
-- Swagger para documentação da API  
-- Jest e Supertest para testes automatizados  
-
----
+- Node.js e Express
+- PostgreSQL e Sequelize
+- JWT para autenticação e Bcrypt (bcryptjs) para hash de senhas
+- Swagger para documentação da API
+- Jest e Supertest para testes de API
+- Nodemon e dotenv para desenvolvimento e configuração
 
 ## Requisitos
 
-- Node.js (versão 16 ou superior)  
-- PostgreSQL instalado e em execução  
-- NPM ou Yarn  
-
----
+- Node.js 24 ou superior (compatível com os requisitos declarados por Express e Jest)
+- npm
+- PostgreSQL instalado e em execução na porta padrão 5432
 
 ## Instalação
 
-Clone o repositório:
-
 ```bash
-git clone https://github.com/paulovntech/drip-store.git
-cd projeto-backend/project-root
-```
-
-Instale as dependências:
-```bash
+git clone https://github.com/PauloVianaTech/projeto-backend-gt3.git
+cd projeto-backend-gt3
 npm install
 ```
 
+Execute os comandos na pasta que contém o `package.json`.
+
 ## Configuração
 
-Crie um arquivo .env na raiz do projeto com as seguintes variáveis:
-```bash
+Copie `.env.example` para `.env` na mesma pasta do `package.json` e ajuste os valores para seu ambiente:
+
+```dotenv
+PORT=3001
+DB_DIALECT=postgres
 DB_HOST=localhost
 DB_USER=seu_usuario
-DB_PASS=sua_senha
-DB_NAME=nome_do_banco
-DB_PORT=5432
-JWT_SECRET=sua_chave_secreta
+DB_PASSWORD=sua_senha
+DB_NAME=backend_gt3
+JWT_SECRET=substitua_por_uma_chave_secreta_aleatoria
+JWT_EXPIRES_IN=1d
 ```
-Caso utilize o Sequelize CLI, execute as migrações:
+
+Crie previamente o banco indicado em `DB_NAME`, com acesso para o usuário configurado. A conexão usa a porta padrão 5432; configure `DB_PORT` se precisar de outra porta.
+
+Ao iniciar o servidor, o Sequelize sincroniza os modelos com `sync({ alter: true })`, que pode alterar as tabelas existentes. Não há fluxo de migrações configurado neste projeto.
 
 ## Execução
 
-### Aplicação
-
-#### Ambiente de desenvolvimento
+Para desenvolvimento, com reinício automático pelo Nodemon:
 
 ```bash
 npm run dev
 ```
 
-#### Ambiente de produção
+Para iniciar diretamente com Node.js:
+
 ```bash
 npm start
 ```
-A aplicação será iniciada em:
 
-http://localhost:3000
+A API fica disponível em `http://localhost:3001`, ou na porta definida em `PORT`.
 
-Banco de dados
+## Estrutura do projeto
 
-Caso o projeto utilize o Sequelize CLI para gerenciamento do banco, execute as migrações:
-```bash
-npx sequelize-cli db:migrate
-```
-
-## Estrutura do Projeto
+```text
 src/
-├── app.js              # Configuração do Express
-├── server.js           # Inicialização do servidor
-├── config/
-│   └── database.js     # Configuração da conexão com o banco
-├── controllers/        # Camada de controle (requisições e respostas)
-├── services/           # Regras de negócio
-├── models/             # Modelos do banco (Sequelize)
-├── database/           # Inicialização e conexão do ORM
-├── routes/             # Definição das rotas da API
-├── middleware/         # Middlewares (ex: autenticação)
+├── app.js          # Configuração do Express, Swagger e rotas
+├── server.js       # Sincronização do banco e inicialização do servidor
+├── config/         # Configurações do banco
+├── controllers/    # Tratamento de requisições e respostas
+├── services/       # Regras de negócio de produtos
+├── models/         # Modelos e associações do Sequelize
+├── database/       # Inicialização da conexão e dos modelos
+├── routes/         # Rotas da API e anotações Swagger
+└── middleware/     # Autenticação JWT
+tests/
+├── usert.test.js    # Testes de usuários e autenticação
+├── category.test.js
+└── product.test.js
+```
 
-## Funcionalidades
-Autenticação de usuários com JWT
-Cadastro e gerenciamento de usuários
-CRUD completo de categorias
-CRUD completo de produtos
-Suporte a imagens e variações de produtos
-Proteção de rotas com middleware de autenticação
-Exemplos de Uso da API
-Autenticação
+## Funcionalidades e rotas
 
-POST /login
+- Cadastro, consulta, atualização e exclusão de usuários.
+- Autenticação de usuários com JWT.
+- CRUD de categorias e produtos, com busca paginada.
+- Suporte a imagens, opções e associação de produtos a categorias.
+- Middleware de autenticação para operações protegidas.
 
-Exemplo de payload:
-```bash
+| Recurso | Rotas públicas | Rotas com Bearer Token |
+| --- | --- | --- |
+| Usuários | `POST /v1/usuario`, `POST /v1/usuario/token`, `GET /v1/usuario/:id` | `PUT /v1/usuario/:id`, `DELETE /v1/usuario/:id` |
+| Categorias | `GET /v1/categoria/pesquisa`, `GET /v1/categoria/:id` | `POST /v1/categoria`, `PUT /v1/categoria/:id`, `DELETE /v1/categoria/:id` |
+| Produtos | `GET /v1/produto/pesquisa`, `GET /v1/produto/:id` | `POST /v1/produto`, `PUT /v1/produto/:id`, `DELETE /v1/produto/:id` |
+
+## Exemplos de uso
+
+### Login
+
+Com um usuário previamente cadastrado, envie `POST /v1/usuario/token` com o corpo JSON:
+
+```json
 {
-  "email": "usuario@email.com",
-  "password": "senha"
+  "email": "usuario@example.com",
+  "password": "senha_do_usuario"
 }
 ```
 
-Resposta esperada:
-```bash
+Exemplo ilustrativo de resposta:
+
+```json
 {
-  "token": "jwt_token_aqui"
+  "token": "TOKEN_JWT_ILUSTRATIVO"
 }
 ```
-Acesso a rota protegida
 
-GET /products
+### Rota protegida
 
+Para atualizar um produto existente, substitua `1` pelo ID do produto e `<token>` pelo JWT retornado no login:
+
+```http
+PUT /v1/produto/1 HTTP/1.1
+Host: localhost:3001
 Authorization: Bearer <token>
-Documentação da API
+Content-Type: application/json
 
-A documentação interativa da API está disponível via Swagger em:
+{
+  "stock": 10
+}
+```
 
-http://localhost:3000/api-docs
+As consultas de produtos por `GET` são públicas.
+
+## Documentação da API
+
+Com o servidor em execução, acesse o Swagger em:
+
+[http://localhost:3001/api-docs](http://localhost:3001/api-docs)
+
+Ajuste a porta se modificar `PORT`. Os caminhos documentados incluem o prefixo `/v1`, conforme as rotas da API. Para executar operações protegidas pelo botão “Try it out”, use o botão “Authorize” e informe o JWT obtido no login.
 
 ## Testes
 
-Para executar os testes automatizados:
+Os testes usam Jest e Supertest, com arquivos separados para usuários, categorias e produtos.
+
+**Use um banco exclusivo de testes:** as suítes executam `sync({ force: true })`, apagando e recriando suas tabelas. Crie no PostgreSQL local um banco chamado `backend_gt3_test`. Copie `.env.test.example` para `.env.test` e preencha a senha do PostgreSQL local. O Jest carrega esse arquivo antes da aplicação e exige host local e nome de banco terminado em `_test`. O `.env` usado pela API pode continuar apontando para o Supabase. O arquivo `.env.test` é ignorado pelo Git.
+
+Na pasta do `package.json`, execute:
+
 ```bash
-npm run dev
+npm test
 ```
-## Boas Práticas Adotadas
-Arquitetura em camadas (Controllers, Services e Models)
-Separação clara de responsabilidades
-Uso de middlewares para controle de autenticação
-Gerenciamento de variáveis sensíveis com .env
-Estrutura preparada para escalabilidade e novas features
+
+O PostgreSQL precisa estar disponível. O Supertest utiliza a aplicação Express diretamente, sem exigir que `npm run dev` esteja em execução.
 
 ## Contribuição
 
-Contribuições são bem-vindas. Para colaborar:
+Faça um fork e crie uma branch:
 
-Faça um fork do projeto
-Crie uma branch para sua feature:
-git checkout -b feature/nova-feature
-Commit suas alterações:
 ```bash
-git commit -m "feat: descrição da alteração"
+git checkout -b feature/nova-feature
 ```
 
-Envie para o repositório remoto:
+Após implementar e validar as alterações:
+
 ```bash
+git add .
+git commit -m "feat: descrição da alteração"
 git push origin feature/nova-feature
 ```
-Abra um Pull Request
+
+Abra um Pull Request no repositório original.
 
 ## Licença
 
-Este projeto está sob a licença ISC.
+Licença declarada no `package.json`: ISC.
