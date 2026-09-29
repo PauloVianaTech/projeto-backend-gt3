@@ -68,7 +68,7 @@ class ProductService {
     findOptions.include.push(
         { model: ProductImage, as: 'images', attributes: ['id', 'path'] },
         { model: ProductOption, as: 'options' },
-        { model: Category, as: 'categories', attributes: ['id'], through: { attributes: [] } }
+        { model: Category, as: 'categories', attributes: ['id', 'nome'], through: { attributes: [] } }
     );
 
     if (fields) findOptions.attributes = fields.split(',');
