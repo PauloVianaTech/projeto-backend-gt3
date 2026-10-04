@@ -44,7 +44,7 @@ class ProductService {
 
     if (priceRange) {
         const [min, max] = priceRange.split('-').map(Number);
-        findOptions.where.preco = { [Op.between]: [min, max] };
+        findOptions.where.price_with_discount = { [Op.between]: [min, max] };
     }
     
     for (const key in query) {

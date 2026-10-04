@@ -9,6 +9,9 @@ class Product extends Model {
       slug: { type: DataTypes.STRING, allowNull: false, unique: true },
       stock: { type: DataTypes.INTEGER, defaultValue: 0 },
       description: { type: DataTypes.TEXT },
+      brand: { type: DataTypes.STRING },
+      gender: { type: DataTypes.STRING },
+      condition: { type: DataTypes.STRING, defaultValue: 'Novo' },
       preco: { type: DataTypes.FLOAT, allowNull: false },
       price_with_discount: { type: DataTypes.FLOAT, allowNull: false },
     }, {
