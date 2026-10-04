@@ -1,21 +1,36 @@
 # Backend GT3
 
-API de e-commerce desenvolvida com Node.js, Express, PostgreSQL e Sequelize. O projeto segue arquitetura em camadas, com controllers, services, models, routes, middleware e database, além de autenticação JWT, documentação Swagger e testes de API para usuários, categorias e produtos.
+API REST de e-commerce desenvolvida com Node.js, Express, PostgreSQL e Sequelize. O projeto organiza o código em camadas e fornece autenticação JWT, catálogo de produtos, documentação Swagger e testes de integração.
+
+## Recursos
+
+- Arquitetura em camadas: controllers, services, models, routes, middleware e database.
+- Cadastro, consulta, atualização e exclusão de usuários, categorias e produtos.
+- Autenticação com JWT e senhas protegidas com bcryptjs.
+- Produtos com categorias, imagens, opções, marca, gênero, estado e preços com desconto.
+- Busca de produtos por texto, categoria e faixa de preço.
+- Rotas protegidas por Bearer Token.
+- Documentação interativa com Swagger em `/api-docs`.
+- Seed idempotente para criar o catálogo de demonstração com imagens únicas.
+- Testes de API com Jest e Supertest para usuários, categorias e produtos.
 
 ## Tecnologias
 
-- Node.js e Express
-- PostgreSQL e Sequelize
-- JWT para autenticação e Bcrypt (bcryptjs) para hash de senhas
-- Swagger para documentação da API
-- Jest e Supertest para testes de API
-- Nodemon e dotenv para desenvolvimento e configuração
+- Node.js
+- Express
+- PostgreSQL
+- Sequelize
+- JSON Web Token
+- bcryptjs
+- Swagger
+- Jest e Supertest
+- dotenv e Nodemon
 
 ## Requisitos
 
-- Node.js 24 ou superior (compatível com os requisitos declarados por Express e Jest)
+- Node.js 20 ou superior
 - npm
-- PostgreSQL instalado e em execução na porta padrão 5432
+- PostgreSQL
 
 ## Instalação
 
@@ -25,11 +40,13 @@ cd projeto-backend-gt3
 npm install
 ```
 
-Execute os comandos na pasta que contém o `package.json`.
-
 ## Configuração
 
-Copie `.env.example` para `.env` na mesma pasta do `package.json` e ajuste os valores para seu ambiente:
+Copie o arquivo de exemplo e preencha as credenciais do PostgreSQL:
+
+```bash
+cp .env.example .env
+```
 
 ```dotenv
 PORT=3001
@@ -42,137 +59,87 @@ JWT_SECRET=substitua_por_uma_chave_secreta_aleatoria
 JWT_EXPIRES_IN=1d
 ```
 
-Crie previamente o banco indicado em `DB_NAME`, com acesso para o usuário configurado. A conexão usa a porta padrão 5432; configure `DB_PORT` se precisar de outra porta.
-
-Ao iniciar o servidor, o Sequelize sincroniza os modelos com `sync({ alter: true })`, que pode alterar as tabelas existentes. Não há fluxo de migrações configurado neste projeto.
+Crie antes o banco definido em `DB_NAME`. Ao iniciar, o Sequelize sincroniza os modelos com `sync({ alter: true })`.
 
 ## Execução
-
-Para desenvolvimento, com reinício automático pelo Nodemon:
 
 ```bash
 npm run dev
 ```
 
-Para iniciar diretamente com Node.js:
+A API estará disponível em `http://localhost:3001`.
+
+Para iniciar sem Nodemon:
 
 ```bash
 npm start
 ```
 
-A API fica disponível em `http://localhost:3001`, ou na porta definida em `PORT`.
+## Catálogo de demonstração
 
-## Estrutura do projeto
+Depois de configurar o banco, crie ou atualize o catálogo de demonstração:
 
-```text
-src/
-├── app.js          # Configuração do Express, Swagger e rotas
-├── server.js       # Sincronização do banco e inicialização do servidor
-├── config/         # Configurações do banco
-├── controllers/    # Tratamento de requisições e respostas
-├── services/       # Regras de negócio de produtos
-├── models/         # Modelos e associações do Sequelize
-├── database/       # Inicialização da conexão e dos modelos
-├── routes/         # Rotas da API e anotações Swagger
-└── middleware/     # Autenticação JWT
-tests/
-├── usert.test.js    # Testes de usuários e autenticação
-├── category.test.js
-└── product.test.js
+```bash
+npm run seed
 ```
 
-## Funcionalidades e rotas
+O comando pode ser executado mais de uma vez sem duplicar produtos. Ele cria categorias e produtos de tênis, camisetas, calças, bonés e headphones.
 
-- Cadastro, consulta, atualização e exclusão de usuários.
-- Autenticação de usuários com JWT.
-- CRUD de categorias e produtos, com busca paginada.
-- Suporte a imagens, opções e associação de produtos a categorias.
-- Middleware de autenticação para operações protegidas.
+## Rotas principais
 
-| Recurso | Rotas públicas | Rotas com Bearer Token |
+| Recurso | Rotas públicas | Rotas protegidas |
 | --- | --- | --- |
 | Usuários | `POST /v1/usuario`, `POST /v1/usuario/token`, `GET /v1/usuario/:id` | `PUT /v1/usuario/:id`, `DELETE /v1/usuario/:id` |
-| Categorias | `GET /v1/categoria/pesquisa`, `GET /v1/categoria/:id` | `POST /v1/categoria`, `PUT /v1/categoria/:id`, `DELETE /v1/categoria/:id` |
-| Produtos | `GET /v1/produto/pesquisa`, `GET /v1/produto/:id` | `POST /v1/produto`, `PUT /v1/produto/:id`, `DELETE /v1/produto/:id` |
+| Categorias | `GET /v1/categoria/pesquisa`, `GET /v1/categoria/:id` | `POST`, `PUT` e `DELETE /v1/categoria/:id` |
+| Produtos | `GET /v1/produto/pesquisa`, `GET /v1/produto/:id` | `POST`, `PUT` e `DELETE /v1/produto/:id` |
 
-## Exemplos de uso
-
-### Login
-
-Com um usuário previamente cadastrado, envie `POST /v1/usuario/token` com o corpo JSON:
-
-```json
-{
-  "email": "usuario@example.com",
-  "password": "senha_do_usuario"
-}
-```
-
-Exemplo ilustrativo de resposta:
-
-```json
-{
-  "token": "TOKEN_JWT_ILUSTRATIVO"
-}
-```
-
-### Rota protegida
-
-Para atualizar um produto existente, substitua `1` pelo ID do produto e `<token>` pelo JWT retornado no login:
+Use `POST /v1/usuario/token` para obter um JWT. Nas operações protegidas, envie o cabeçalho:
 
 ```http
-PUT /v1/produto/1 HTTP/1.1
-Host: localhost:3001
 Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "stock": 10
-}
 ```
 
-As consultas de produtos por `GET` são públicas.
+## Swagger
 
-## Documentação da API
-
-Com o servidor em execução, acesse o Swagger em:
+Com a API em execução, acesse:
 
 [http://localhost:3001/api-docs](http://localhost:3001/api-docs)
 
-Ajuste a porta se modificar `PORT`. Os caminhos documentados incluem o prefixo `/v1`, conforme as rotas da API. Para executar operações protegidas pelo botão “Try it out”, use o botão “Authorize” e informe o JWT obtido no login.
+Os caminhos documentados já incluem o prefixo `/v1`. Use **Authorize** para informar o JWT antes de testar uma rota protegida.
 
 ## Testes
 
-Os testes usam Jest e Supertest, com arquivos separados para usuários, categorias e produtos.
-
-**Use um banco exclusivo de testes:** as suítes executam `sync({ force: true })`, apagando e recriando suas tabelas. Crie no PostgreSQL local um banco chamado `backend_gt3_test`. Copie `.env.test.example` para `.env.test` e preencha a senha do PostgreSQL local. O Jest carrega esse arquivo antes da aplicação e exige host local e nome de banco terminado em `_test`. O `.env` usado pela API pode continuar apontando para o Supabase. O arquivo `.env.test` é ignorado pelo Git.
-
-Na pasta do `package.json`, execute:
+Os testes usam um banco separado porque recriam as tabelas. Copie o exemplo e configure um banco local com nome terminado em `_test`:
 
 ```bash
+cp .env.test.example .env.test
 npm test
 ```
 
-O PostgreSQL precisa estar disponível. O Supertest utiliza a aplicação Express diretamente, sem exigir que `npm run dev` esteja em execução.
+O arquivo `.env.test` não é enviado ao Git. O PostgreSQL deve estar disponível, mas não é necessário iniciar o servidor com `npm run dev`.
 
-## Contribuição
+## Estrutura
 
-Faça um fork e crie uma branch:
-
-```bash
-git checkout -b feature/nova-feature
+```text
+src/
+├── config/        # Configurações
+├── controllers/   # Requisições e respostas
+├── database/      # Conexão e inicialização dos modelos
+├── middleware/    # Autenticação JWT
+├── models/        # Modelos Sequelize
+├── routes/        # Rotas e anotações Swagger
+├── services/      # Regras de negócio
+├── app.js         # Express, Swagger e rotas
+└── server.js      # Inicialização do servidor
+scripts/
+└── seed.js        # Catálogo de demonstração
+tests/             # Testes de integração
 ```
 
-Após implementar e validar as alterações:
+## Frontend integrado
 
-```bash
-git add .
-git commit -m "feat: descrição da alteração"
-git push origin feature/nova-feature
-```
-
-Abra um Pull Request no repositório original.
+O frontend deste projeto está em [E-commerce Drip Store](https://github.com/PauloVianaTech/ecommerce-drip-store).
 
 ## Licença
 
-Licença declarada no `package.json`: ISC.
+ISC.
