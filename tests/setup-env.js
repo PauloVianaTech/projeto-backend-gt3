@@ -16,4 +16,9 @@ if (!['localhost', '127.0.0.1', '::1'].includes(config.DB_HOST) || !config.DB_NA
   throw new Error('Os testes exigem um banco local com nome terminado em _test. O banco configurado não foi acessado.');
 }
 
-Object.assign(process.env, config, { NODE_ENV: 'test', DB_DIALECT: 'postgres', DB_PORT: config.DB_PORT || '5432' });
+Object.assign(process.env, config, {
+  NODE_ENV: 'test',
+  DB_DIALECT: 'postgres',
+  DB_PORT: config.DB_PORT || '5432',
+  ADMIN_EMAILS: config.ADMIN_EMAILS || 'admin.cat@example.com,admin.prod@example.com',
+});

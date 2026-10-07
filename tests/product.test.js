@@ -12,11 +12,11 @@ beforeAll(async () => {
   
   await request(app).post('/v1/usuario').send({
       firstname: 'Test', surname: 'Prod', email: 'admin.prod@example.com',
-      password: 'password123', confirmPassword: 'password123',
+      password: 'Password123!', confirmPassword: 'Password123!',
   });
 
   const tokenRes = await request(app).post('/v1/usuario/token').send({
-      email: 'admin.prod@example.com', password: 'password123',
+      email: 'admin.prod@example.com', password: 'Password123!',
   });
   token = tokenRes.body.token;
 

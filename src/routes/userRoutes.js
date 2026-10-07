@@ -2,6 +2,7 @@ const { Router } = require('express');
 const userController = require('../controllers/UserController');
 const authController = require('../controllers/AuthController');
 const authMiddleware = require('../middleware/auth');
+const { selfOrAdmin } = require('../middleware/accessControl');
 
 const router = Router();
 
@@ -76,7 +77,7 @@ router.post('/token', authController.generateToken);
  *       '404':
  *         description: 'Usuário não encontrado.'
  */
-router.get('/:id', userController.getById);
+router.get('/:id', authMiddleware, selfOrAdmin, userController.getById);
 
 /**
  * @swagger
@@ -165,7 +166,7 @@ router.post('/', userController.create);
  *       '404':
  *         description: 'Usuário não encontrado.'
  */
-router.put('/:id', authMiddleware, userController.update);
+router.put('/:id', authMiddleware, selfOrAdmin, userController.update);
 
 /**
  * @swagger
@@ -192,6 +193,6 @@ router.put('/:id', authMiddleware, userController.update);
  *       '404':
  *         description: 'Usuário não encontrado.'
  */
-router.delete('/:id', authMiddleware, userController.delete);
+router.delete('/:id', authMiddleware, selfOrAdmin, userController.delete);
 
 module.exports = router;

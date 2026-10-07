@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const productController = require('../controllers/ProductController');
 const authMiddleware = require('../middleware/auth');
+const { adminOnly } = require('../middleware/accessControl');
 
 const router = Router();
 
@@ -156,7 +157,7 @@ router.get('/:id', productController.getById);
  *       '401':
  *         description: 'Não autorizado. Token inválido ou não fornecido.'
  */
-router.post('/', authMiddleware, productController.create);
+router.post('/', authMiddleware, adminOnly, productController.create);
 
 /**
  * @swagger
@@ -217,7 +218,7 @@ router.post('/', authMiddleware, productController.create);
  *       '404':
  *         description: 'Produto não encontrado.'
  */
-router.put('/:id', authMiddleware, productController.update);
+router.put('/:id', authMiddleware, adminOnly, productController.update);
 
 /**
  * @swagger
@@ -244,6 +245,6 @@ router.put('/:id', authMiddleware, productController.update);
  *       '404':
  *         description: 'Produto não encontrado.'
  */
-router.delete('/:id', authMiddleware, productController.delete);
+router.delete('/:id', authMiddleware, adminOnly, productController.delete);
 
 module.exports = router;

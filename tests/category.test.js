@@ -15,15 +15,15 @@ beforeAll(async () => {
       firstname: 'Test',
       surname: 'Admin',
       email: 'admin.cat@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
     });
 
   const res = await request(app)
     .post('/v1/usuario/token')
     .send({
       email: 'admin.cat@example.com',
-      password: 'password123',
+      password: 'Password123!',
     });
   token = res.body.token;
 });
@@ -54,7 +54,7 @@ describe('Category API', () => {
       .post('/v1/categoria')
       .send(testCategory);
     
-    expect(res.statusCode).toEqual(400); // O middleware está retornando 400 para token ausente
+    expect(res.statusCode).toEqual(401);
   });
   
   it('should get a list of categories', async () => {

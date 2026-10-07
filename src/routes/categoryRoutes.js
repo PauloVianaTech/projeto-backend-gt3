@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const categoryController = require('../controllers/CategoryController');
 const authMiddleware = require('../middleware/auth');
+const { adminOnly } = require('../middleware/accessControl');
 
 const router = Router();
 
@@ -107,7 +108,7 @@ router.get('/:id', categoryController.getById);
  *       '401':
  *         description: 'Não autorizado. Token inválido ou não fornecido.'
  */
-router.post('/', authMiddleware, categoryController.create);
+router.post('/', authMiddleware, adminOnly, categoryController.create);
 
 /**
  * @swagger
@@ -150,7 +151,7 @@ router.post('/', authMiddleware, categoryController.create);
  *       '404':
  *         description: 'Categoria não encontrada.'
  */
-router.put('/:id', authMiddleware, categoryController.update);
+router.put('/:id', authMiddleware, adminOnly, categoryController.update);
 
 /**
  * @swagger
@@ -177,6 +178,6 @@ router.put('/:id', authMiddleware, categoryController.update);
  *       '404':
  *         description: 'Categoria não encontrada.'
  */
-router.delete('/:id', authMiddleware, categoryController.delete);
+router.delete('/:id', authMiddleware, adminOnly, categoryController.delete);
 
 module.exports = router;

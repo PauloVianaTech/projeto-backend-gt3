@@ -14,14 +14,22 @@ const productRoutes = require('./routes/productRoutes');
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 300,
+  limit: 120,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
 });
 
+const registrationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 3,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { error: 'Muitos cadastros a partir deste endereço. Tente novamente mais tarde.' },
+});
+
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 10,
+  limit: 5,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Muitas tentativas de login. Tente novamente em alguns minutos.' },
@@ -31,6 +39,7 @@ class App {
   constructor() {
     this.server = express();
     this.server.set('trust proxy', 1);
+    this.server.disable('x-powered-by');
     this.middlewares();
     this.swaggerConfig();
     this.routes();
@@ -50,7 +59,7 @@ class App {
         return callback(new Error('Origem não autorizada pelo CORS.'));
       },
     }));
-    this.server.use(express.json({ limit: '50mb' }));
+    this.server.use(express.json({ limit: '2mb' }));
   }
 
   swaggerConfig() {
@@ -93,6 +102,7 @@ class App {
 
     this.server.use('/v1', apiLimiter);
     this.server.use('/v1/usuario/token', loginLimiter);
+    this.server.post('/v1/usuario', registrationLimiter);
     this.server.use('/v1/usuario', userRoutes);
     this.server.use('/v1/categoria', categoryRoutes);
     this.server.use('/v1/produto', productRoutes);

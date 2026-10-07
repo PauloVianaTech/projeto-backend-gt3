@@ -19,7 +19,25 @@ class UserController {
 
   async create(req, res) {
     const { email, password, confirmPassword, firstname, surname } = req.body;
-    
+
+    if (!firstname || !surname || !email || !password || !confirmPassword) {
+      return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'E-mail inválido.' });
+    }
+
+    const strongPassword = password.length >= 10
+      && /[A-Z]/.test(password)
+      && /[a-z]/.test(password)
+      && /\d/.test(password)
+      && /[^A-Za-z0-9]/.test(password);
+
+    if (!strongPassword) {
+      return res.status(400).json({ error: 'A senha deve ter ao menos 10 caracteres, com letras maiúsculas, minúsculas, número e símbolo.' });
+    }
+
     if (password !== confirmPassword) return res.status(400).json({ error: 'As senhas não conferem.' });
     if (await User.findOne({ where: { email } })) return res.status(400).json({ error: 'Este email já está em uso.' });
     
