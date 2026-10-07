@@ -57,6 +57,10 @@ class App {
   }
 
   routes() {
+    this.server.get('/health', (_request, response) => {
+      response.status(200).json({ status: 'ok' });
+    });
+
     this.server.use('/v1/usuario', userRoutes);
     this.server.use('/v1/categoria', categoryRoutes);
     this.server.use('/v1/produto', productRoutes);
